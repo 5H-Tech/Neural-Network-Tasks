@@ -1,15 +1,33 @@
 from tkinter import *
+from tkinter import messagebox
 import tkinter.ttk as ttk
+import pandas as pd
+
 
 
 class Gui:
     def btn_clicked(self):
+        global class1
+        global class2
+        global feature1
+        global feature2
+        global variable1
+        global variable2
+
+        class1 = self.entry0.get()
+        class2 = self.entry2.get()
+        feature1 = self.entry1.get()
+        feature2 = self.entry3.get()
         print("Button Clicked")
+
     def __init__(self, master=None):
-        
-
+        global species
+        global feature
+        global var1
+        df = pd.read_csv("Datasets/penguins.csv")
+        species = list(df["species"].unique())
+        feature = list(df.columns[1:])
         self.window = Tk()
-
         self.window.geometry("900x600")
         self.window.configure(bg="#FFFFFF")
         self.canvas = Canvas(
@@ -27,29 +45,26 @@ class Gui:
             450.0, 352.0,
             image=self.background_img)
 
-        self.entry0 = ttk.Combobox(self.window)
-
+        self.entry0 = ttk.Combobox(self.window,state="readonly",values= species)
         self.entry0.place(
             x=175, y=126,
             width=230,
             height=33)
 
-        self.entry1 = ttk.Combobox(self.window)
-
+        self.entry1 = ttk.Combobox(self.window ,state="readonly",values =feature)
         self.entry1.place(
             x=175, y=237,
             width=230,
             height=33)
 
-        self.entry2 = ttk.Combobox(self.window)
-
+        self.entry2 = ttk.Combobox(self.window ,state="readonly",values=species)
         self.entry2.place(
             x=514, y=126,
             width=230,
             height=33)
+        self.entry2.bind()
 
-        self.entry3 = ttk.Combobox(self.window)
-
+        self.entry3 = ttk.Combobox(self.window,state="readonly",values =feature)
         self.entry3.place(
             x=514, y=237,
             width=230,
@@ -69,11 +84,11 @@ class Gui:
             width=160,
             height=28)
 
-        self.entry6 = ttk.Checkbutton(self.window)
-        self.entry6.configure(text='checkbutton1')
+        self.entry6 = ttk.Checkbutton(self.window, onvalue=1, offvalue=0)
+        self.entry6.configure(text='bias')
         self.entry6.place(
             x=465, y=465,
-            width=160,
+            width=65,
             height=28)
 
         self.entry7_img = PhotoImage(file=f"img_textBox7.png")
