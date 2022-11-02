@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import train_test_split
 
 df = pd.read_csv('Datasets/penguins.csv')
 weight1 = np.random.rand()
@@ -24,17 +25,24 @@ def preprocessing(df):
     return df_scaled
 
 def train_phase(first_feature, second_feature, target_output, is_bias, learning_rate):
+    new_weight1 = weight1
+    new_weight2 = weight2
+    new_bias = bias
+    # Looping over all samples
     for i in range(len(first_feature)):
-        value = (first_feature[i] * weight1) + (second_feature[i] * weight2) + (is_bias * bias)
+        value = (first_feature[i] * new_weight1) + (second_feature[i] * new_weight2) + (is_bias * new_bias)
         # Signum Activation function
         if(value < 0):
             y = -1
         else:
             y = 1
         error = target_output[i] - y
-        #weight1 = weight1 + (learning_rate * first_feature[i] * error)
-        #weight2 = weight2 + (learning_rate * second_feature[i] * error)
-        #bias = bias + (learning_rate * is_bias * error)
+        # Updating the weights and bias
+        new_weight1 += (learning_rate * first_feature[i] * error)
+        new_weight2 += (learning_rate * second_feature[i] * error)
+        new_bias += (learning_rate * is_bias * error)
+    
+    return new_weight1, new_weight2, new_bias
 
 # Made in a function to run it directly from the window.py file (Implemented)
 def run_model(first_feature, second_feature, first_class, second_class, is_bias, epochs, learning_rate):
@@ -48,13 +56,17 @@ def run_model(first_feature, second_feature, first_class, second_class, is_bias,
     dropped_class = sum(list(dfr["species"].unique())) - first_class_number - second_class_number
     dfr = dfr[dfr['species'] != dropped_class]
 
+    dfr['species'] = dfr['species'].replace(first_class_number, -1)
+    dfr['species'] = dfr['species'].replace(second_class_number, 1)
+
     # This is just a placeholder for the data
     #-----------------------------------------------------Split the data (60% train, 40% test)--------------------------------------------------
-    first_feature_gui = dfr[first_feature]
-    second_feature_gui = dfr[second_feature]
-    target_output_gui = dfr['species']
+    first_train, first_test = train_test_split(dfr[dfr['species'] == -1], test_size=0.4, train_size=0.6, shuffle=True)
+    second_train, second_test = train_test_split(dfr[dfr['species'] == 1], test_size=0.4, train_size=0.6, shuffle=True)
+    merged_train = first_train
+    merged_test = first_test
 
     # Loops the training process depending on the epochs
     for i in range(epochs):
-        train_phase(first_feature_gui, second_feature_gui, target_output_gui, is_bias, learning_rate)
+        weight1, weight2, bias = train_phase(merged_train[first_feature], merged_train[second_feature], merged_train['species'], is_bias, learning_rate)
     
