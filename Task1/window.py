@@ -1,8 +1,8 @@
-import tkinter
 from tkinter import *
 from tkinter import messagebox
 import tkinter.ttk as ttk
 import pandas as pd
+import main
 
 class Gui:
     def btn_clicked(self):
@@ -10,23 +10,25 @@ class Gui:
         global class2
         global feature1
         global feature2
-        global learing_rate
+        global learning_rate
         global epochs
-        global bias
+        global is_bias
 
         class1 = self.entry0.get()
         class2 = self.entry2.get()
         feature1 = self.entry1.get()
         feature2 = self.entry3.get()
-        learing_rate = self.entry7.get()
+        learning_rate = self.entry7.get()
         epochs = self.entry8.get()
-        bias = var1.get()
+        is_bias = var1.get()
         try:
             float(self.entry7.get()) or int(self.entry7.get())
             float(self.entry8.get()) or int(self.entry8.get())
         except ValueError:
             messagebox.showinfo("Error", "Please, Enter the valid number")
+        main.run_model(feature1, feature2, class1, class2, int(is_bias), int(float(epochs)), float(learning_rate))
         print("Button Clicked")
+        
 
     def __init__(self, master=None):
         global species
@@ -187,7 +189,7 @@ class Gui:
 
         self.canvas.create_text(
             470, 366.0,
-            text="Number of\nEpocqs",
+            text="Number of\nEpochs",
             fill="#ffffff",
             font=("None", int(16.0)))
 
