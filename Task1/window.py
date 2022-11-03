@@ -1,8 +1,11 @@
 from tkinter import *
 from tkinter import messagebox
 import tkinter.ttk as ttk
+import numpy as np
 import pandas as pd
-import main
+import matplotlib.pyplot as plt
+import single_layer_perceptron as slp
+
 
 class Gui:
     def btn_clicked(self):
@@ -22,13 +25,21 @@ class Gui:
         epochs = self.entry8.get()
         is_bias = var1.get()
         try:
-            float(self.entry7.get()) or int(self.entry7.get())
-            float(self.entry8.get()) or int(self.entry8.get())
+            learning_rate = float(learning_rate)
+            epochs = int(epochs)
+            model = slp.slp(learning_rate=learning_rate, epchos=epochs, is_bise=1, first_class=class1,
+                            second_class=class2,
+                            first_featur=feature1, second_featuer=feature2)
+            model.preprocessing(df=pd.read_csv('Datasets/penguins.csv'))
+            model.run_model()
+            y_res = model.predict(model.x_test)
+            model.evalution(y_res)
+            model.plot_confusion_matrix(model.y_test, y_res)
         except ValueError:
             messagebox.showinfo("Error", "Please, Enter the valid number")
-        main.run_model(feature1, feature2, class1, class2, int(is_bias), int(float(epochs)), float(learning_rate))
+        # main.run_model(feature1, feature2, class1, class2, int(is_bias), int(float(epochs)), float(learning_rate))
+
         print("Button Clicked")
-        
 
     def __init__(self, master=None):
         global species
@@ -80,22 +91,22 @@ class Gui:
             height=33)
 
         scale_1 = IntVar(value=0)
-        self.entry4 = ttk.Scale(self.window,variable=scale_1,to=100)
+        self.entry4 = ttk.Scale(self.window, variable=scale_1, to=100)
         self.entry4.place(
             x=175, y=348,
             width=190,
             height=28)
 
         scale_2 = IntVar(value=0)
-        self.entry5 = ttk.Scale(self.window,variable=scale_2,to=10000)
+        self.entry5 = ttk.Scale(self.window, variable=scale_2, to=10000)
         self.entry5.place(
             x=525, y=348,
             width=190,
             height=28)
 
         global var1
-        var1= IntVar()
-        self.entry6 = ttk.Checkbutton(self.window,variable=var1, onvalue=1, offvalue=0)
+        var1 = IntVar()
+        self.entry6 = ttk.Checkbutton(self.window, variable=var1, onvalue=1, offvalue=0)
         self.entry6.configure(text='bias')
         self.entry6.place(
             x=465, y=465,
@@ -110,7 +121,7 @@ class Gui:
         self.entry7 = Entry(
             bd=0,
             bg="#d9d9d9",
-            highlightthickness=0,textvariable=scale_1)
+            highlightthickness=0, textvariable=scale_1)
 
         self.entry7.place(
             x=370, y=347,
@@ -125,7 +136,7 @@ class Gui:
         self.entry8 = Entry(
             bd=0,
             bg="#d9d9d9",
-            highlightthickness=0,textvariable=scale_2)
+            highlightthickness=0, textvariable=scale_2)
 
         self.entry8.place(
             x=720, y=348,
@@ -208,6 +219,27 @@ class Gui:
     def run(self):
         self.window.resizable(False, False)
         self.window.mainloop()
+
+    def evalution(self, x_tran, y_tran, y_test, y_pred_test, weight1, weight2, bias):
+        # print("Perceptron classification accuracy", accuracy(y_test, y_pred_test))
+
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 1, 1)
+        plt.scatter(x_tran[:, 0], x_tran[:, 1], marker="o", c=y_tran)
+
+        x0_1 = np.amin(x_tran[:, 0])
+        x0_2 = np.amax(x_tran[:, 0])
+
+        x1_1 = (-weight1 * x0_1 - bias) / weight2
+        x1_2 = (-weight1 * x0_2 - bias) / weight2
+
+        ax.plot([x0_1, x0_2], [x1_1, x1_2], "k")
+
+        ymin = np.amin(x_tran[:, 1])
+        ymax = np.amax(x_tran[:, 1])
+        ax.set_ylim([ymin - 3, ymax + 3])
+
+        plt.show()
 
 
 if __name__ == "__main__":
