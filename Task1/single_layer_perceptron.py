@@ -50,7 +50,7 @@ class slp:
         self.X = np.array(self.dataset[[self.first_featur, self.second_featur]])
         self.Y = np.array(self.dataset[self.lable])
 
-        self.x_tran, self.x_test, self.y_tran, self.y_test = train_test_split(self.X, self.Y, test_size=0.4,
+        self.x_tran, self.x_test, self.y_tran, self.y_test = train_test_split(self.X, self.Y, test_size=0.1,
                                                                               shuffle=True,
                                                                               random_state=123)
         print('preprocessing done!')
@@ -126,20 +126,20 @@ class slp:
 
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
-        plt.scatter(self.X[:, 0], self.X[:, 1], marker="o", c=self.Y)
+        plt.scatter(self.x_test[:, 0], self.x_test[:, 1], marker="o", c=self.y_test)
         plt.title(f'{self.first_class} vs {self.second_class} ')
         plt.xlabel(self.first_featur)
         plt.ylabel(self.second_featur)
-        x0_1 = np.amin(self.X[:, 0])
-        x0_2 = np.amax(self.X[:, 0])
+        x0_1 = np.amin(self.x_test[:, 0])
+        x0_2 = np.amax(self.x_test[:, 0])
 
         x1_1 = (-self.weights[0] * x0_1 - self.bias) / self.weights[1]
         x1_2 = (-self.weights[0] * x0_2 - self.bias) / self.weights[1]
 
         ax.plot([x0_1, x0_2], [x1_1, x1_2], "k")
 
-        ymin = np.amin(self.X[:, 1])
-        ymax = np.amax(self.X[:, 1])
+        ymin = np.amin(self.x_test[:, 1])
+        ymax = np.amax(self.x_test[:, 1])
         ax.set_ylim([ymin - 3, ymax + 3])
         plt.show()
 
