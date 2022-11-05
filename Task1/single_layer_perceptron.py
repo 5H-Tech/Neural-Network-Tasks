@@ -8,28 +8,34 @@ import numpy as np
 pd.options.mode.chained_assignment = None
 
 
-class slp:
-    def __init__(self, learning_rate=0.01, epchos=1000, is_bise=1,
-                 first_featur='', second_featuer='',
+def unit_step_func(x):
+    return np.where(x >= 0, 1, -1)
+
+
+def get_accuracy(y_true, y_pred):
+    accuracy = np.sum(y_true == y_pred) / len(y_true)
+    return accuracy
+
+
+class Slp:
+    def __init__(self, learning_rate=0.01, epochs=1000, is_bias=1,
+                 first_feature='', second_feature='',
                  first_class='', second_class=''):
         self.lr = learning_rate
-        self.epchos = epchos
-        self.is_bise = is_bise
-        self.activation_func = self._unit_step_func
+        self.epochs = epochs
+        self.is_bias = is_bias
+        self.activation_func = unit_step_func
         self.weights = np.random.rand(2)
         self.bias = np.random.rand()
-        self.first_featur = first_featur
-        self.second_featur = second_featuer
+        self.first_feature = first_feature
+        self.second_feature = second_feature
         self.first_class = first_class
         self.second_class = second_class
-        self.lable = 'species'
-        self.dataset = None
-        self.X = None
-        self.Y = None
+        self.label = 'species'
         self.x_test = None
         self.y_test = None
-        self.x_tran = None
-        self.y_tran = None
+        self.x_train = None
+        self.y_train = None
 
     def preprocessing(self, df=pd.read_csv('Datasets/penguins.csv')):
         print('preprocessing started ....')
@@ -38,93 +44,69 @@ class slp:
         df['gender'] = lab.fit_transform(df['gender'])
         df['gender'] = df['gender'].replace(2, df['gender'].median())
         scaler = MinMaxScaler()
-        # drop not needed data
+        # drop unnecessary data
         for col in df.columns.values:
-            if col != self.first_featur and col != self.second_featur and col != self.lable:
+            if col != self.first_feature and col != self.second_feature and col != self.label:
                 df.drop(col, axis=1, inplace=True)
         types = ['Chinstrap', 'Adelie', 'Gentoo']
         types.remove(self.first_class)
         types.remove(self.second_class)
         df = df[df.species != types[0]]
-        df[self.lable] = df[self.lable].replace(self.first_class, -1)
-        df[self.lable] = df[self.lable].replace(self.second_class, 1)
-        df[[self.first_featur]] = scaler.fit_transform(df[[self.first_featur]])
-        df[[self.second_featur]] = scaler.fit_transform(df[[self.second_featur]])
-        df.to_csv('look.csv')
-        self.dataset = df
-        self.X = np.array(self.dataset[[self.first_featur, self.second_featur]])
-        self.Y = np.array(self.dataset[self.lable])
+        df[self.label] = df[self.label].replace(self.first_class, -1)
+        df[self.label] = df[self.label].replace(self.second_class, 1)
+        df[[self.first_feature]] = scaler.fit_transform(df[[self.first_feature]])
+        df[[self.second_feature]] = scaler.fit_transform(df[[self.second_feature]])
 
-        self.x_tran, self.x_test, self.y_tran, self.y_test = train_test_split(self.X, self.Y, test_size=0.9,
-                                                                              shuffle=True,
-                                                                              random_state=123)
+        first_train, first_test = train_test_split(df[df[self.label] == -1], test_size=0.4, train_size=0.6,
+                                                   shuffle=True)
+        second_train, second_test = train_test_split(df[df[self.label] == 1], test_size=0.4, train_size=0.6,
+                                                     shuffle=True)
+
+        train_data=pd.concat([first_train,second_train],ignore_index=True).sample(frac=1).reset_index(drop=True)
+        test_data=pd.concat([first_test,second_test],ignore_index=True).sample(frac=1).reset_index(drop=True)
+
+        self.x_train = np.array(train_data[[self.first_feature, self.second_feature]])
+        self.y_train = np.array(train_data[self.label])
+        self.x_test = np.array(test_data[[self.first_feature, self.second_feature]])
+        self.y_test = np.array(test_data[self.label])
         print('preprocessing done!')
 
     def train_phase(self):
         new_weights = self.weights
         new_bias = self.bias
 
-        for idx, x_i in enumerate(self.x_tran):
+        for idx, x_i in enumerate(self.x_train):
             net_output = np.dot(x_i, new_weights) + new_bias
             y_hat = 1 if net_output >= 0 else -1
 
-            updata = self.lr * (self.y_tran[idx] - y_hat)
-            print(f'the weights is updated by : {updata}')
-            new_weights += updata * x_i
-            new_bias += updata
+            updated_weight = self.lr * (self.y_train[idx] - y_hat)
+            new_weights += updated_weight * x_i
+            new_bias += updated_weight*self.is_bias
 
         return new_weights, new_bias
 
     def run_model(self):
         # Loops the training process depending on the epochs
-        for i in range(self.epchos):
+        for i in range(self.epochs):
             self.weights, self.bias = self.train_phase()
 
-    # def fit(self, X, y):
-    #     n_samples, n_features = X.shape
-    #
-    #     # init parameters
-    #     self.weights = np.zeros(n_features)
-    #     self.bias = 0
-    #
-    #     # y_ = np.array([1 if i > 0 else -1 for i in y])
-    #
-    #     for _ in range(self.epchos):
-    #
-    #         for idx, x_i in enumerate(X):
-    #             linear_output = np.dot(x_i, self.weights) + self.bias
-    #             y_predicted = self.activation_func(linear_output)
-    #
-    #             # Perceptron update rule
-    #             update = self.lr * (y[idx] - y_predicted)
-    #
-    #             self.weights += update * x_i
-    #             self.bias += update
-
-    def predict(self, X):
-        linear_output = np.dot(X, self.weights) + self.bias
+    def predict(self, x):
+        linear_output = np.dot(x, self.weights) + self.bias
         y_predicted = self.activation_func(linear_output)
         return y_predicted
 
-    def _unit_step_func(self, x):
-        return np.where(x >= 0, 1, -1)
-
-    def accuracy(self, y_true, y_pred):
-        accuracy = np.sum(y_true == y_pred) / len(y_true)
-        return accuracy
-
-    def evalution(self, y_pred_test):
-        print("Perceptron classification accuracy", self.accuracy(self.y_test, y_pred_test))
+    def evaluation(self, y_pred_test):
+        print("Perceptron classification accuracy", get_accuracy(self.y_test, y_pred_test))
 
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
         plt.title(f'{self.first_class} vs {self.second_class} ')
-        plt.xlabel(self.first_featur)
-        plt.ylabel(self.second_featur)
-        plt.scatter(self.X[:, 0], self.X[:, 1], marker="o", c=self.Y)
+        plt.xlabel(self.first_feature)
+        plt.ylabel(self.second_feature)
+        plt.scatter(self.x_test[:, 0], self.x_test[:, 1], marker="o", c=self.y_test)
 
-        x0_1 = np.amin(self.X[:, 0])
-        x0_2 = np.amax(self.X[:, 0])
+        x0_1 = np.amin(self.x_test[:, 0])
+        x0_2 = np.amax(self.x_test[:, 0])
 
         x1_1 = (-self.weights[0] * x0_1 - self.bias) / self.weights[1]
         x1_2 = (-self.weights[0] * x0_2 - self.bias) / self.weights[1]
@@ -138,7 +120,8 @@ class slp:
 
     # Bulid Confusion Matrix using actual and predicted data
     def confusion_matrix(self, actual_data, predicted_data):
-        # Create a Zip which is an iterator of tuples that returns each item in the list with its counterpart in the other list
+        # Create a Zip which is an iterator of tuples that returns each item in the list with its counterpart
+        #in the other list
         key = zip(actual_data, predicted_data)
         dict = {}
 
@@ -160,18 +143,9 @@ class slp:
         con_mat = self.confusion_matrix(actual_list, predicted_list)
         hm = sns.heatmap(con_mat, annot=True, xticklabels=con_mat.index, yticklabels=con_mat.columns)
         hm.invert_yaxis()
+        plt.title(f'+ve class is {self.first_class} and -ve class is {self.second_class}')
         plt.xlabel("Predicted Values")
         plt.ylabel("Actual Values")
         plt.show()
         return True
 
-# if __name__ == "__main__":
-#     # SLP = slp(first_class='Adelie', second_class='Gentoo', first_featur='gender', second_featuer='bill_length_mm')
-#     # res = SLP.preprocessing()
-#     # X = res[[SLP.first_featur, SLP.second_featur]]
-#     # X = np.array(X)
-#     # Y = res[SLP.lable]
-#     # Y = np.array(Y)
-#     # x_tran, y_tran, x_test, y_test = train_test_split(X, Y, test_size=0.4, shuffle=True, random_state=123)
-#     # SLP.fit(x_tran, y_tran)
-#     # y_hat = SLP.predict(x_test, y_test)

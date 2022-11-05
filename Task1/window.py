@@ -27,13 +27,13 @@ class Gui:
         try:
             learning_rate = float(learning_rate)
             epochs = int(epochs)
-            model = slp.slp(learning_rate=learning_rate, epchos=epochs, is_bise=is_bias, first_class=class1,
+            model = slp.Slp(learning_rate=learning_rate, epochs=epochs, is_bias=is_bias, first_class=class1,
                             second_class=class2,
-                            first_featur=feature1, second_featuer=feature2)
+                            first_feature=feature1, second_feature=feature2)
             model.preprocessing(df=pd.read_csv('Datasets/penguins.csv'))
             model.run_model()
             y_res = model.predict(model.x_test)
-            model.evalution(y_res)
+            model.evaluation(y_res)
             model.plot_confusion_matrix(model.y_test, y_res)
         except ValueError:
             messagebox.showinfo("Error", f'Please, Enter the valid number{ValueError}')
@@ -218,7 +218,7 @@ class Gui:
         self.window.resizable(False, False)
         self.window.mainloop()
 
-    def evalution(self, x_tran, y_tran, y_test, y_pred_test, weight1, weight2, bias):
+    def evaluation(self, x_tran, y_tran, y_test, y_pred_test, weight1, weight2, bias):
         # print("Perceptron classification accuracy", accuracy(y_test, y_pred_test))
 
         fig = plt.figure()
