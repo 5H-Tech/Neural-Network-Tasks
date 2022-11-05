@@ -4,6 +4,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
+
 pd.options.mode.chained_assignment = None
 
 
@@ -15,7 +16,7 @@ class slp:
         self.epchos = epchos
         self.is_bise = is_bise
         self.activation_func = self._unit_step_func
-        self.weights = np.zeros(2)
+        self.weights = np.random.rand(2)
         self.bias = np.random.rand()
         self.first_featur = first_featur
         self.second_featur = second_featuer
@@ -36,42 +37,33 @@ class slp:
         # label encoding
         df['gender'] = lab.fit_transform(df['gender'])
         df['gender'] = df['gender'].replace(2, df['gender'].median())
+        scaler = MinMaxScaler()
         # drop not needed data
         for col in df.columns.values:
             if col != self.first_featur and col != self.second_featur and col != self.lable:
                 df.drop(col, axis=1, inplace=True)
-        types = ['Chinstrap','Adelie','Gentoo']
+        types = ['Chinstrap', 'Adelie', 'Gentoo']
         types.remove(self.first_class)
         types.remove(self.second_class)
         df = df[df.species != types[0]]
         df[self.lable] = df[self.lable].replace(self.first_class, -1)
         df[self.lable] = df[self.lable].replace(self.second_class, 1)
+        df[[self.first_featur]] = scaler.fit_transform(df[[self.first_featur]])
+        df[[self.second_featur]] = scaler.fit_transform(df[[self.second_featur]])
+        df.to_csv('look.csv')
         self.dataset = df
         self.X = np.array(self.dataset[[self.first_featur, self.second_featur]])
         self.Y = np.array(self.dataset[self.lable])
 
-        self.x_tran, self.x_test, self.y_tran, self.y_test = train_test_split(self.X, self.Y, test_size=0.1,
+        self.x_tran, self.x_test, self.y_tran, self.y_test = train_test_split(self.X, self.Y, test_size=0.9,
                                                                               shuffle=True,
                                                                               random_state=123)
         print('preprocessing done!')
 
     def train_phase(self):
         new_weights = self.weights
-        new_bias = self.bias * self.is_bise
-        # Looping over all samples
-        # for i in range(len(first_feature)):
-        #     value = (first_feature.values[i] * new_weight1) + (second_feature.valuse[i] * new_weight2) + (
-        #             is_bias * new_bias)
-        #     # Signum Activation function
-        #     if value < 0:
-        #         y = -1
-        #     else:
-        #         y = 1
-        #     error = target_output[i] - y
-        #     # Updating the weights and bias
-        #     new_weight1 += (learning_rate * first_feature[i] * error)
-        #     new_weight2 += (learning_rate * second_feature[i] * error)
-        #     new_bias += (learning_rate * is_bias * error)
+        new_bias = self.bias
+
         for idx, x_i in enumerate(self.x_tran):
             net_output = np.dot(x_i, new_weights) + new_bias
             y_hat = 1 if net_output >= 0 else -1
@@ -79,7 +71,7 @@ class slp:
             updata = self.lr * (self.y_tran[idx] - y_hat)
             print(f'the weights is updated by : {updata}')
             new_weights += updata * x_i
-            new_bias = updata
+            new_bias += updata
 
         return new_weights, new_bias
 
@@ -126,12 +118,13 @@ class slp:
 
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
-        plt.scatter(self.x_test[:, 0], self.x_test[:, 1], marker="o", c=self.y_test)
         plt.title(f'{self.first_class} vs {self.second_class} ')
         plt.xlabel(self.first_featur)
         plt.ylabel(self.second_featur)
-        x0_1 = np.amin(self.x_test[:, 0])
-        x0_2 = np.amax(self.x_test[:, 0])
+        plt.scatter(self.X[:, 0], self.X[:, 1], marker="o", c=self.Y)
+
+        x0_1 = np.amin(self.X[:, 0])
+        x0_2 = np.amax(self.X[:, 0])
 
         x1_1 = (-self.weights[0] * x0_1 - self.bias) / self.weights[1]
         x1_2 = (-self.weights[0] * x0_2 - self.bias) / self.weights[1]
@@ -140,11 +133,11 @@ class slp:
 
         ymin = np.amin(self.x_test[:, 1])
         ymax = np.amax(self.x_test[:, 1])
-        ax.set_ylim([ymin - 3, ymax + 3])
+        ax.set_ylim([ymin - 0.1, ymax + 0.1])
         plt.show()
 
     # Bulid Confusion Matrix using actual and predicted data
-    def confusion_matrix(self,actual_data, predicted_data):
+    def confusion_matrix(self, actual_data, predicted_data):
         # Create a Zip which is an iterator of tuples that returns each item in the list with its counterpart in the other list
         key = zip(actual_data, predicted_data)
         dict = {}
@@ -163,7 +156,7 @@ class slp:
         return df
 
     # Plot Confusion Matrix as heatmap
-    def plot_confusion_matrix(self,actual_list, predicted_list):
+    def plot_confusion_matrix(self, actual_list, predicted_list):
         con_mat = self.confusion_matrix(actual_list, predicted_list)
         hm = sns.heatmap(con_mat, annot=True, xticklabels=con_mat.index, yticklabels=con_mat.columns)
         hm.invert_yaxis()

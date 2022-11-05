@@ -27,7 +27,7 @@ class Gui:
         try:
             learning_rate = float(learning_rate)
             epochs = int(epochs)
-            model = slp.slp(learning_rate=learning_rate, epchos=epochs, is_bise=1, first_class=class1,
+            model = slp.slp(learning_rate=learning_rate, epchos=epochs, is_bise=is_bias, first_class=class1,
                             second_class=class2,
                             first_featur=feature1, second_featuer=feature2)
             model.preprocessing(df=pd.read_csv('Datasets/penguins.csv'))
@@ -36,10 +36,8 @@ class Gui:
             model.evalution(y_res)
             model.plot_confusion_matrix(model.y_test, y_res)
         except ValueError:
-            messagebox.showinfo("Error", "Please, Enter the valid number")
+            messagebox.showinfo("Error", f'Please, Enter the valid number{ValueError}')
         # main.run_model(feature1, feature2, class1, class2, int(is_bias), int(float(epochs)), float(learning_rate))
-
-        print("Button Clicked")
 
     def __init__(self, master=None):
         global species

@@ -104,7 +104,8 @@ def evalution(x_tran, y_tran, y_test, y_pred_test, weight1, weight2, bias):
 
 # Bulid Confusion Matrix using actual and predicted data
 def confusion_matrix(actual_data, predicted_data):
-    # Create a Zip which is an iterator of tuples that returns each item in the list with its counterpart in the other list
+    # Create a Zip which is an iterator of tuples that returns each item in the list with its counterpart in the
+    # other list
     key = zip(actual_data, predicted_data)
     dict = {}
 
