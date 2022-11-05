@@ -119,9 +119,11 @@ class Slp:
         plt.show()
 
     # Bulid Confusion Matrix using actual and predicted data
-    def confusion_matrix(self, actual_data, predicted_data):
+    def confusion_matrix(self, Actual_data, Predicted_data):
         # Create a Zip which is an iterator of tuples that returns each item in the list with its counterpart
         #in the other list
+        actual_data = [self.first_class if x==1 else self.second_class for x in Actual_data]
+        predicted_data = [self.first_class if x==1 else self.second_class for x in Predicted_data]
         key = zip(actual_data, predicted_data)
         dict = {}
 
@@ -143,7 +145,6 @@ class Slp:
         con_mat = self.confusion_matrix(actual_list, predicted_list)
         hm = sns.heatmap(con_mat, annot=True, xticklabels=con_mat.index, yticklabels=con_mat.columns)
         hm.invert_yaxis()
-        plt.title(f'+ve class is {self.first_class} and -ve class is {self.second_class}')
         plt.xlabel("Predicted Values")
         plt.ylabel("Actual Values")
         plt.show()
