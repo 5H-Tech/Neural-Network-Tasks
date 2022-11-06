@@ -44,6 +44,10 @@ class Slp:
         df['gender'] = lab.fit_transform(df['gender'])
         df['gender'] = df['gender'].replace(2, df['gender'].median())
         scaler = MinMaxScaler()
+
+        df[[self.first_feature]] = scaler.fit_transform(df[[self.first_feature]])
+        df[[self.second_feature]] = scaler.fit_transform(df[[self.second_feature]])
+        self.three_classes_evaluation(df)
         # drop unnecessary data
         for col in df.columns.values:
             if col != self.first_feature and col != self.second_feature and col != self.label:
@@ -54,8 +58,8 @@ class Slp:
         df = df[df.species != types[0]]
         df[self.label] = df[self.label].replace(self.first_class, -1)
         df[self.label] = df[self.label].replace(self.second_class, 1)
-        df[[self.first_feature]] = scaler.fit_transform(df[[self.first_feature]])
-        df[[self.second_feature]] = scaler.fit_transform(df[[self.second_feature]])
+        # df[[self.first_feature]] = scaler.fit_transform(df[[self.first_feature]])
+        # df[[self.second_feature]] = scaler.fit_transform(df[[self.second_feature]])
 
         first_train, first_test = train_test_split(df[df[self.label] == -1], test_size=0.4, train_size=0.6,
                                                    shuffle=True)
@@ -118,16 +122,21 @@ class Slp:
         ax.set_ylim([ymin - 0.1, ymax + 0.1])
         plt.show()
 
-    # Bulid Confusion Matrix using actual and predicted data
+
+    def three_classes_evaluation(self,df):
+        sns.pairplot(df, hue="species", height=2,corner=True)
+        plt.show()
+
+    # Build Confusion Matrix using actual and predicted data
     def confusion_matrix(self, Actual_data, Predicted_data):
         # Create a Zip which is an iterator of tuples that returns each item in the list with its counterpart
-        #in the other list
+        # in the other list
         actual_data = [self.first_class if x==1 else self.second_class for x in Actual_data]
         predicted_data = [self.first_class if x==1 else self.second_class for x in Predicted_data]
         key = zip(actual_data, predicted_data)
         dict = {}
 
-        # Loop to add tuple as key in dictionay and update The number of times it appears
+        # Loop to add tuple as key in dictionary and update The number of times it appears
         for actual, predicted in key:
             if (actual, predicted) in dict:
                 dict[(actual, predicted)] += 1
