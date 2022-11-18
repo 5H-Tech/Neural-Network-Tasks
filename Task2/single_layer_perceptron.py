@@ -90,7 +90,7 @@ class Slp:
 
     def run_model(self):
         # Loops the training process till reaching the threshold
-        while True:
+        for i in range(10000):
             self.weights, self.bias, error_summation = self.train_phase()
             mse = error_summation/self.x_train.size
             if mse <= self.mse_threshold:
