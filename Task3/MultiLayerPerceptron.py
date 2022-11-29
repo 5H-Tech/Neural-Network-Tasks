@@ -1,5 +1,5 @@
 from Layer import Layer
-from preprocessing_utilts import preprocessing
+from preprocessing_utilts import *
 
 
 class MultiLayerPerceptron:
@@ -28,6 +28,7 @@ class MultiLayerPerceptron:
                 neuron.update_weights(learning_rete=self.learning_rate)
 
     def fit(self, x, y):
+        rows = x.shape[0]
         num_festers = x.shape[1]
 
         self.layers[0].init(num_festers)
@@ -37,11 +38,11 @@ class MultiLayerPerceptron:
             self.layers[i].init(num_input)
 
         for i in range(self.epics):
-            for j in range(x.shape[0]):
+            for j in range(rows):
                 row = x[j]  # take the random sample from the dataset
                 yhat = self.predict(row)
                 target = y[j]
-                # Update the layers using backpropagation
+
                 self.update_layers(target)
 
             if i % 100 == 0:
@@ -57,7 +58,7 @@ class MultiLayerPerceptron:
             # print(y_hat)
             # print(y[t_i])
             a = True
-            for k in range(3):
+            for k in range(y.shape[1]):
                 if y[t_i][k] != y_hat[k]:
                     a = False
                     break
@@ -84,15 +85,16 @@ class MultiLayerPerceptron:
         return outputs
 
 
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import train_test_split
+
 # Multilayer testing
 if __name__ == "__main__":
-    x_train, x_test, y_train, y_test = preprocessing()
-
-    clf = MultiLayerPerceptron(0.01, 1000, True)
-    clf.add_output_layer(3)
-    clf.add_hidden_layer(3)
-    clf.add_hidden_layer(4)
-
+    x_train, x_test, y_train, y_test = MNIST_preprocessing()
+    clf = MultiLayerPerceptron(0.1, 500, True)
+    clf.add_output_layer(10)
+    clf.add_hidden_layer(128)
     clf.fit(x_train, y_train)
-
-    clf.predict_and_get_accuracy(x_test, y_test, "Test")
+    clf.predict_and_get_accuracy(x_test, y_test)

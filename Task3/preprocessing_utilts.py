@@ -23,3 +23,14 @@ def preprocessing():
     y_test = np.array(y_test)
     print('preprocessing done!')
     return x_train, x_test, y_train, y_test
+
+
+def MNIST_preprocessing():
+    df = pd.read_csv('Datasets/MINIST/mnist_train.csv')
+    y = pd.get_dummies(df.label, prefix='')
+    y = np.array(y)
+    df = df.drop('label', axis=1)
+    scaler = MinMaxScaler()
+    x = np.array(df)
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=42)
+    return x_train, x_test, y_train, y_test
