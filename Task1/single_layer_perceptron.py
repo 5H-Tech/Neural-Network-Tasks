@@ -66,8 +66,8 @@ class Slp:
         second_train, second_test = train_test_split(df[df[self.label] == 1], test_size=0.4, train_size=0.6,
                                                      shuffle=True)
 
-        train_data=pd.concat([first_train,second_train],ignore_index=True).sample(frac=1).reset_index(drop=True)
-        test_data=pd.concat([first_test,second_test],ignore_index=True).sample(frac=1).reset_index(drop=True)
+        train_data = pd.concat([first_train, second_train], ignore_index=True).sample(frac=1).reset_index(drop=True)
+        test_data = pd.concat([first_test, second_test], ignore_index=True).sample(frac=1).reset_index(drop=True)
 
         self.x_train = np.array(train_data[[self.first_feature, self.second_feature]])
         self.y_train = np.array(train_data[self.label])
@@ -85,7 +85,7 @@ class Slp:
 
             updated_weight = self.lr * (self.y_train[idx] - y_hat)
             new_weights += updated_weight * x_i
-            new_bias += updated_weight*self.is_bias
+            new_bias += updated_weight * self.is_bias
 
         return new_weights, new_bias
 
@@ -122,17 +122,16 @@ class Slp:
         ax.set_ylim([ymin - 0.1, ymax + 0.1])
         plt.show()
 
-
-    def three_classes_evaluation(self,df):
-        sns.pairplot(df, hue="species", height=2,corner=True)
+    def three_classes_evaluation(self, df):
+        sns.pairplot(df, hue="species", height=2, corner=True)
         plt.show()
 
     # Build Confusion Matrix using actual and predicted data
     def confusion_matrix(self, Actual_data, Predicted_data):
         # Create a Zip which is an iterator of tuples that returns each item in the list with its counterpart
         # in the other list
-        actual_data = [self.first_class if x==1 else self.second_class for x in Actual_data]
-        predicted_data = [self.first_class if x==1 else self.second_class for x in Predicted_data]
+        actual_data = [self.first_class if x == 1 else self.second_class for x in Actual_data]
+        predicted_data = [self.first_class if x == 1 else self.second_class for x in Predicted_data]
         key = zip(actual_data, predicted_data)
         dict = {}
 
@@ -158,4 +157,3 @@ class Slp:
         plt.ylabel("Actual Values")
         plt.show()
         return True
-

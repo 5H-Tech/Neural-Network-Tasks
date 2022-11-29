@@ -38,8 +38,8 @@ class Neuron:
 
     # forward step
     def predict(self, input):
-        self.inputs = np.insert(input, 0, 1)
-        tmp_output =np.dot(self.inputs, self.weights)
+        self.inputs = np.append(input, 1)
+        tmp_output = np.dot(self.inputs, self.weights)
         self.output, self.d_output = sigmoid(tmp_output) if self.is_sigmoid else tanh(tmp_output)
         return self.output
 
@@ -56,6 +56,7 @@ class Neuron:
     # forward step
     def update_weights(self, learning_rete):
         self.weights += self.inputs * self.local_error * learning_rete
+
 
 # testing the neuron
 if __name__ == "__main__":
@@ -75,18 +76,19 @@ if __name__ == "__main__":
     y_test = np.array(y_test)
     print('preprocessing done!')
     #
-    n1 = Neuron(1, False, True)
-    n2 = Neuron(1, True, True)
+    n1 = Neuron(1, False, True)  # input
+    n2 = Neuron(1, True, True)  # output
     n1.init(x_test.shape[1])
     n2.init(x_test.shape[1])
     a = [n2]
     n1.attatch(a)
 
-    # the output
-    n2.predict(x_train[0])
-    n2.clc_update(y_test[-1])
-    n2.update_weights(0.1)
-    # input
+    # foreword
     n1.predict(x_train[1])
+    n2.predict(x_train[0])
+    # BACKWARD
+    n2.clc_update(y_test[-1])
     n1.clc_update(y_test[0])
+    # FOREWORD
     n1.update_weights(0.1)
+    n2.update_weights(0.1)
