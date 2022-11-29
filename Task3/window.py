@@ -3,8 +3,30 @@ from tkinter import messagebox
 import tkinter.ttk as ttk
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import multi_layer_perceptron as mlp
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, MinMaxScaler
+from MultiLayerPerceptron import MultiLayerPerceptron
+
+
+def preprocessing():
+    print('preprocessing started ....')
+    df = pd.read_csv('Datasets/penguins.csv')
+    lab = LabelEncoder()
+    # label encoding
+    df['gender'] = lab.fit_transform(df['gender'])
+    df['gender'] = df['gender'].replace(2, df['gender'].median())
+    scaler = MinMaxScaler()
+    y = pd.get_dummies(df.species, prefix='')
+    df.drop('species', axis=1, inplace=True)
+    for col in df.columns.values:
+        df[col] = scaler.fit_transform(df[[col]])
+    x_train, x_test, y_train, y_test = train_test_split(df, y, test_size=0.3, random_state=42)
+    x_train = np.array(x_train)
+    x_test = np.array(x_test)
+    y_train = np.array(y_train)
+    y_test = np.array(y_test)
+    print('preprocessing done!')
+    return x_train, x_test, y_train, y_test
 
 
 class Gui:
@@ -25,27 +47,21 @@ class Gui:
 
         try:
             learning_rate = float(learning_rate)
-            epochs = int(epochs)
             hidden_layers = int(hidden_layers)
             neurons = int(neurons)
-            model = mlp.Mlp(learning_rate=learning_rate, epochs=epochs, is_bias=is_bias, hidden_layers=hidden_layers,
-                            neurons=neurons, act_func_type=activation_function)
-            model.preprocessing(df=pd.read_csv('Datasets/penguins.csv'))
-            model.run_model()
-            y_res = model.predict(model.x_test)
-            model.evaluation(y_res)
-            model.plot_confusion_matrix(model.y_test, y_res)
+            epochs = int(epochs)
+            x_train, x_test, y_train, y_test = preprocessing()
+            clf = MultiLayerPerceptron(learning_rate, epochs, activation_function == 'Sigmoid')
+            clf.add_output_layer(3)
+            for i in range(hidden_layers):
+                clf.add_hidden_layer(neurons)
+            clf.fit(x_train, y_train)
+            clf.predict_and_get_accuracy(x_test, y_test, "Test")
         except ValueError:
             messagebox.showinfo("Error", f'Please, Enter the valid number{ValueError}')
-        # main.run_model(feature1, feature2, class1, class2, int(is_bias), int(float(epochs)), float(learning_rate))
 
     def __init__(self, master=None):
-        # global species
-        # global feature
         global activation_functions
-        df = pd.read_csv("Datasets/penguins.csv")
-        # species = list(df["species"].unique())
-        # feature = list(df.columns[1:])
         activation_functions = ['Sigmoid', 'Hyperbolic Tangent Sigmoid']
         self.window = Tk()
         self.window.geometry("900x600")
@@ -128,12 +144,10 @@ class Gui:
             x=370, y=347,
             width=40,
             height=28)
-        # command = lambda: self.entry5.set('%d' % float(self.entry5))
 
         # Epochs scale
         epochs_scale = IntVar(value=0)
-        self.entry7 = Scale(from_=0, to=1000, resolution=1,variable=epochs_scale,orient=HORIZONTAL)
-        #self.entry7 = ttk.Scale(self.window, variable=epochs_scale, to=1000)
+        self.entry7 = Scale(from_=0, to=1000, resolution=1, variable=epochs_scale, orient=HORIZONTAL)
         self.entry7.place(
             x=525, y=348,
             width=190,
@@ -150,7 +164,6 @@ class Gui:
             width=40,
             height=50)
 
-
         global var1
         var1 = IntVar()
         self.entry9 = ttk.Checkbutton(self.window, variable=var1, onvalue=1, offvalue=0)
@@ -159,20 +172,6 @@ class Gui:
             x=410, y=430,
             width=65,
             height=28)
-
-        # self.entry7_img = PhotoImage(file=f"img_textBox7.png")
-        # self.entry7_bg = self.canvas.create_image(
-        #     363.0, 362.0,
-        #     image=self.entry7_img)
-
-
-
-        # self.entry8_img = PhotoImage(file=f"img_textBox8.png")
-        # self.entry8_bg = self.canvas.create_image(
-        #     703.0, 362.0,
-        #     image=self.entry8_img)
-
-
 
         self.img0 = PhotoImage(file=f"img0.png")
         self.b0 = Button(
@@ -291,27 +290,6 @@ class Gui:
     def run(self):
         self.window.resizable(False, False)
         self.window.mainloop()
-
-    def evaluation(self, x_tran, y_tran, y_test, y_pred_test, weight1, weight2, bias):
-        # print("Perceptron classification accuracy", accuracy(y_test, y_pred_test))
-
-        fig = plt.figure()
-        ax = fig.add_subplot(1, 1, 1)
-        plt.scatter(x_tran[:, 0], x_tran[:, 1], marker="o", c=y_tran)
-
-        x0_1 = np.amin(x_tran[:, 0])
-        x0_2 = np.amax(x_tran[:, 0])
-
-        x1_1 = (-weight1 * x0_1 - bias) / weight2
-        x1_2 = (-weight1 * x0_2 - bias) / weight2
-
-        ax.plot([x0_1, x0_2], [x1_1, x1_2], "k")
-
-        ymin = np.amin(x_tran[:, 1])
-        ymax = np.amax(x_tran[:, 1])
-        ax.set_ylim([ymin - 3, ymax + 3])
-
-        plt.show()
 
 
 if __name__ == "__main__":

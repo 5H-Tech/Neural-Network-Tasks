@@ -87,7 +87,8 @@ class MultiLayerPerceptron:
         return outputs
 
 
-if __name__ == "__main__":
+def preprocessing():
+    global x_train, x_test, y_train, y_test
     print('preprocessing started ....')
     df = pd.read_csv('Datasets/penguins.csv')
     lab = LabelEncoder()
@@ -106,7 +107,11 @@ if __name__ == "__main__":
     y_test = np.array(y_test)
     print('preprocessing done!')
 
-    clf = MultiLayerPerceptron(0.1, 1000, True)
+
+if __name__ == "__main__":
+    preprocessing()
+
+    clf = MultiLayerPerceptron(0.01, 1000, True)
     clf.add_output_layer(3)
     clf.add_hidden_layer(3)
     clf.add_hidden_layer(4)
