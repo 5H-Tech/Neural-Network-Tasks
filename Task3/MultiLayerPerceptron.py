@@ -1,4 +1,5 @@
 from Layer import Layer
+from Task3.preprocessing_utilts import MNIST_preprocessing
 from preprocessing_utilts import *
 
 
@@ -45,10 +46,10 @@ class MultiLayerPerceptron:
 
                 self.update_layers(target)
 
-            if i % 100 == 0:
-                acc = self.predict_and_get_accuracy(x, y)
-                if acc == 1:
-                    break
+            # if i % 100 == 0:
+            acc = self.predict_and_get_accuracy(x, y)
+            if acc == 1:
+                break
 
     def predict_and_get_accuracy(self, x, y, type="Train"):
         num_rows = x.shape[0]
@@ -74,9 +75,10 @@ class MultiLayerPerceptron:
             activations = self.layers[i].predict(activations)
 
         outputs = []
+        max_val = max(activations)
+
         for activation in activations:
-            # Decide if we output a 1 or 0
-            if activation >= 0.5:
+            if activation == max_val:
                 outputs.append(1.0)
             else:
                 outputs.append(0.0)
@@ -85,15 +87,10 @@ class MultiLayerPerceptron:
         return outputs
 
 
-import pandas as pd
-import numpy as np
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.model_selection import train_test_split
-
 # Multilayer testing
 if __name__ == "__main__":
     x_train, x_test, y_train, y_test = MNIST_preprocessing()
-    clf = MultiLayerPerceptron(0.1, 500, True)
+    clf = MultiLayerPerceptron(0.1, 1000, True)
     clf.add_output_layer(10)
     clf.add_hidden_layer(128)
     clf.fit(x_train, y_train)
