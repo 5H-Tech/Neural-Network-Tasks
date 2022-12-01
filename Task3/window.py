@@ -5,9 +5,6 @@ from preprocessing_utilts import preprocessing
 from MultiLayerPerceptron import MultiLayerPerceptron
 
 
-
-
-
 class Gui:
     def btn_clicked(self):
         global activation_function
@@ -25,17 +22,22 @@ class Gui:
         is_bias = var1.get()
 
         try:
+            tmp_tokens = neurons.split(',')
+            num_neurons_par_hidden =[]
+            for token in tmp_tokens:
+                num_neurons_par_hidden.append(int(token))
             learning_rate = float(learning_rate)
             hidden_layers = int(hidden_layers)
-            neurons = int(neurons)
+            # neurons = int(neurons)
             epochs = int(epochs)
             x_train, x_test, y_train, y_test = preprocessing()
-            clf = MultiLayerPerceptron(learning_rate, epochs, activation_function == 'Sigmoid')
+            clf = MultiLayerPerceptron(learning_rate, 100000, activation_function == 'Sigmoid')
             clf.add_output_layer(3)
             for i in range(hidden_layers):
-                clf.add_hidden_layer(neurons)
+                clf.add_hidden_layer(num_neurons_par_hidden[i])
             clf.fit(x_train, y_train)
             clf.predict_and_get_accuracy(x_test, y_test, "Test")
+            clf.plot_accuracy_graph()
         except ValueError:
             messagebox.showinfo("Error", f'Please, Enter the valid number{ValueError}')
 
@@ -67,42 +69,42 @@ class Gui:
             width=230,
             height=33)
 
-        # Hidden layers scale
-        hidden_layers_scale = IntVar(value=0)
-        self.entry1 = ttk.Scale(self.window, variable=hidden_layers_scale, to=100)
-        self.entry1.place(
-            x=175, y=237,
-            width=190,
-            height=28)
+        # # Hidden layers scale
+        # hidden_layers_scale = IntVar(value=0)
+        # self.entry1 = ttk.Scale(self.window, variable=hidden_layers_scale, to=100)
+        # self.entry1.place(
+        #     x=175, y=237,
+        #     width=190,
+        #     height=28)
 
         # Hidden layers textbox
         self.entry2 = Entry(
             bd=0,
             bg="#d9d9d9",
-            highlightthickness=0, textvariable=hidden_layers_scale)
+            highlightthickness=0)
 
         self.entry2.place(
-            x=370, y=237,
-            width=40,
+            x=225, y=237,
+            width=100,
             height=28)
 
-        # Neurons scale
-        neurons_scale = IntVar(value=0)
-        self.entry3 = ttk.Scale(self.window, variable=neurons_scale, to=100)
-        self.entry3.place(
-            x=526, y=237,
-            width=190,
-            height=28)
+        # # Neurons scale
+        # neurons_scale = IntVar(value=0)
+        # self.entry3 = ttk.Scale(self.window, variable=neurons_scale, to=100)
+        # self.entry3.place(
+        #     x=526, y=237,
+        #     width=190,
+        #     height=28)
 
         # Neurons textbox
         self.entry4 = Entry(
             bd=0,
             bg="#d9d9d9",
-            highlightthickness=0, textvariable=neurons_scale)
+            highlightthickness=0)
 
         self.entry4.place(
-            x=720, y=237,
-            width=40,
+            x=520, y=237,
+            width=250,
             height=28)
 
         # Learning rate scale

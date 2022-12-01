@@ -32,5 +32,5 @@ def MNIST_preprocessing():
     df = df.drop('label', axis=1)
     scaler = MinMaxScaler()
     x = np.array(df)
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=42)
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.7, random_state=42)
     return x_train, x_test, y_train, y_test
