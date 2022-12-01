@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
 import tkinter.ttk as ttk
-from preprocessing_utilts import preprocessing
+from preprocessing_utilts import *
 from MultiLayerPerceptron import MultiLayerPerceptron
 
 
@@ -30,9 +30,14 @@ class Gui:
             hidden_layers = int(hidden_layers)
             # neurons = int(neurons)
             epochs = int(epochs)
-            x_train, x_test, y_train, y_test = preprocessing()
-            clf = MultiLayerPerceptron(learning_rate, 100000, activation_function == 'Sigmoid')
-            clf.add_output_layer(3)
+            if(is_bias==0):
+                x_train, x_test, y_train, y_test = preprocessing()
+                clf = MultiLayerPerceptron(learning_rate, epochs, activation_function == 'Sigmoid')
+                clf.add_output_layer(3)
+            else:
+                x_train, x_test, y_train, y_test = MNIST_preprocessing()
+                clf = MultiLayerPerceptron(learning_rate, epochs, activation_function == 'Sigmoid')
+                clf.add_output_layer(10)
             for i in range(hidden_layers):
                 clf.add_hidden_layer(num_neurons_par_hidden[i])
             clf.fit(x_train, y_train)
@@ -148,7 +153,7 @@ class Gui:
         global var1
         var1 = IntVar()
         self.entry9 = ttk.Checkbutton(self.window, variable=var1, onvalue=1, offvalue=0)
-        self.entry9.configure(text='bias')
+        self.entry9.configure(text='MNIST')
         self.entry9.place(
             x=410, y=430,
             width=65,
