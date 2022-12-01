@@ -17,7 +17,7 @@ class Layer:
 
     def attach(self, layer):
         for i in range(len(self.neurons)):
-            self.neurons[i].attatch(layer.neurons)
+            self.neurons[i].attach(layer.neurons)
 
     def predict(self, input):
         activations = [neuron.predict(input) for neuron in self.neurons]
@@ -90,8 +90,6 @@ if __name__ == "__main__":
                 tmp.append(1)
             else:
                 tmp.append(0)
-        # print(tmp)
-        # print(f'the real is {y_test[i]} predected is {tmp}')
 
         a = True
         for k in range(3):
@@ -99,4 +97,4 @@ if __name__ == "__main__":
                 a = False
         if a:
             right += 1
-    print(f'accrucy ={right / x_test.shape[0]}')
+    print(f'accuracy ={right / x_test.shape[0]}')

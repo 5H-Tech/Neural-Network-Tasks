@@ -1,5 +1,4 @@
 from Layer import Layer
-from Task3.preprocessing_utilts import MNIST_preprocessing
 from preprocessing_utilts import *
 from matplotlib import pyplot as plt
 
@@ -74,7 +73,7 @@ class MultiLayerPerceptron:
         if epoc == -1:
             print(f'{type} accuracy ={acc}')
         else:
-            print(f'at epochs number {epoc} accuracy =={acc}')
+            print(f'at epoch number {epoc} accuracy = {acc}')
         return acc
 
     def predict(self, row):

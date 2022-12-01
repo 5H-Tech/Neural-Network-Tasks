@@ -31,7 +31,7 @@ class Neuron:
     def init(self, input_size):
         self.weights = np.random.rand(input_size + 1)
 
-    def attatch(self, neurons):
+    def attach(self, neurons):
         self.next_neurons = neurons
 
     # forward step
@@ -65,14 +65,14 @@ if __name__ == "__main__":
     n1.init(x_test.shape[1])
     n2.init(x_test.shape[1])
     a = [n2]
-    n1.attatch(a)
+    n1.attach(a)
 
-    # foreword
+    # FORWARD
     n1.predict(x_train[1])
     n2.predict(x_train[0])
     # BACKWARD
     n2.clc_update(y_test[-1])
     n1.clc_update(y_test[0])
-    # FOREWORD
+    # FORWARD
     n1.update_weights(0.1)
     n2.update_weights(0.1)

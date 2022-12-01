@@ -30,7 +30,7 @@ class Gui:
             hidden_layers = int(hidden_layers)
             # neurons = int(neurons)
             epochs = int(epochs)
-            if(is_bias==0):
+            if is_bias == 0:
                 x_train, x_test, y_train, y_test = preprocessing()
                 clf = MultiLayerPerceptron(learning_rate, epochs, activation_function == 'Sigmoid')
                 clf.add_output_layer(3)
@@ -74,14 +74,6 @@ class Gui:
             width=230,
             height=33)
 
-        # # Hidden layers scale
-        # hidden_layers_scale = IntVar(value=0)
-        # self.entry1 = ttk.Scale(self.window, variable=hidden_layers_scale, to=100)
-        # self.entry1.place(
-        #     x=175, y=237,
-        #     width=190,
-        #     height=28)
-
         # Hidden layers textbox
         self.entry2 = Entry(
             bd=0,
@@ -89,17 +81,9 @@ class Gui:
             highlightthickness=0)
 
         self.entry2.place(
-            x=225, y=237,
-            width=100,
+            x=300, y=237,
+            width=40,
             height=28)
-
-        # # Neurons scale
-        # neurons_scale = IntVar(value=0)
-        # self.entry3 = ttk.Scale(self.window, variable=neurons_scale, to=100)
-        # self.entry3.place(
-        #     x=526, y=237,
-        #     width=190,
-        #     height=28)
 
         # Neurons textbox
         self.entry4 = Entry(
@@ -133,7 +117,7 @@ class Gui:
 
         # Epochs scale
         epochs_scale = IntVar(value=0)
-        self.entry7 = Scale(from_=0, to=1000, resolution=1, variable=epochs_scale, orient=HORIZONTAL)
+        self.entry7 = Scale(from_=0, to=5000, resolution=1, variable=epochs_scale, orient=HORIZONTAL)
         self.entry7.place(
             x=525, y=348,
             width=190,
@@ -191,22 +175,11 @@ class Gui:
             font=("None", int(16.0)))
 
         self.canvas.create_text(
-            108.0, 254.5,
-            text="Number of\nHidden Layers",
+            180.5, 254.5,
+            text="Number of Hidden Layers",
             fill="#ffffff",
             font=("None", int(16.0)))
 
-        self.canvas.create_text(
-            175, 226,
-            text="0",
-            fill="#ffffff",
-            font=("None", int(16.0)))
-
-        self.canvas.create_text(
-            365, 226,
-            text="100",
-            fill="#ffffff",
-            font=("None", int(16.0)))
         self.canvas.create_text(
             105.5, 363.0,
             text="Learning\nRate",
@@ -226,20 +199,8 @@ class Gui:
             font=("None", int(16.0)))
 
         self.canvas.create_text(
-            466.0, 254.5,
-            text="Neurons /\nLayer",
-            fill="#ffffff",
-            font=("None", int(16.0)))
-
-        self.canvas.create_text(
-            525, 226,
-            text="0",
-            fill="#ffffff",
-            font=("None", int(16.0)))
-
-        self.canvas.create_text(
-            715, 226,
-            text="100",
+            436.0, 254.5,
+            text="Neurons /Layer",
             fill="#ffffff",
             font=("None", int(16.0)))
 
@@ -251,7 +212,7 @@ class Gui:
 
         self.canvas.create_text(
             715, 330,
-            text="1000",
+            text="5000",
             fill="#ffffff",
             font=("None", int(16.0)))
 
