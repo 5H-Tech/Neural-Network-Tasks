@@ -43,6 +43,7 @@ class Gui:
             clf.fit(x_train, y_train)
             clf.predict_and_get_accuracy(x_test, y_test, "Test")
             clf.plot_accuracy_graph()
+            clf.plot_confusion_matrix(y_test)
         except ValueError:
             messagebox.showinfo("Error", f'Please, Enter the valid number{ValueError}')
 

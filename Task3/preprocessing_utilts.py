@@ -17,7 +17,7 @@ def preprocessing():
     df.drop('species', axis=1, inplace=True)
     for col in df.columns.values:
         df[col] = scaler.fit_transform(df[[col]])
-    x_train, x_test, y_train, y_test = train_test_split(df, y, test_size=0.3, random_state=42)
+    x_train, x_test, y_train, y_test = train_test_split(df, y, test_size=0.4, random_state=42)
     x_train = np.array(x_train)
     x_test = np.array(x_test)
     y_train = np.array(y_train)

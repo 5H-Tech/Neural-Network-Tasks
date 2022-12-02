@@ -1,6 +1,7 @@
 from Layer import Layer
 from preprocessing_utilts import *
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
+from sklearn import metrics
 
 
 class MultiLayerPerceptron:
@@ -11,6 +12,7 @@ class MultiLayerPerceptron:
         self.is_sigmoid = is_sigmoid
         self.accuracy_list = []
         self.ep_list = []
+        self.prediction = []
 
     def add_output_layer(self, no_neurons):
         self.layers.append(Layer(no_neurons, is_output_layer=True, is_sigmoid=self.is_sigmoid))
@@ -56,12 +58,12 @@ class MultiLayerPerceptron:
                 break
 
     def predict_and_get_accuracy(self, x, y, type="Train", epoc=-1):
+        self.prediction = []
         num_rows = x.shape[0]
         right = 0
         for t_i in range(num_rows):
             y_hat = self.predict(x[t_i])
-            # print(y_hat)
-            # print(y[t_i])
+            self.prediction.append(y_hat)
             a = True
             for k in range(y.shape[1]):
                 if y[t_i][k] != y_hat[k]:
@@ -99,14 +101,38 @@ class MultiLayerPerceptron:
         plt.ylabel('Accuracy')
         plt.show()
 
+    def plot_confusion_matrix(self, y):
+        self.prediction = np.array(self.prediction)
+        con = np.zeros((y.shape[1], y.shape[1]))
+        for i in range(y.shape[0]):
+            tmp = y[i]
+            for j in range(y.shape[1]):
+                if tmp[j] == 1:
+                    for k in range(self.prediction.shape[1]):
+                        if self.prediction[i][k] == 1:
+                            con[j][k] += 1
+
+        print('Confusion Matrix')
+        print(con)
+        if con.shape[0] > 3:
+            cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=con)
+            cm_display.plot()
+            plt.show()
+        else:
+            cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=con,
+                                                        display_labels=['Adelie', 'Gentoo', 'Chinstrap'])
+            cm_display.plot()
+            plt.show()
+
+
 # Multilayer testing
+
 if __name__ == "__main__":
     x_train, x_test, y_train, y_test = preprocessing()
-    clf = MultiLayerPerceptron(0.3, 10000, True)
+    clf = MultiLayerPerceptron(0.1, 100, True)
     clf.add_output_layer(3)
     clf.add_hidden_layer(2)
-    clf.add_hidden_layer(3)
-    clf.add_hidden_layer(4)
     clf.fit(x_train, y_train)
     clf.predict_and_get_accuracy(x_test, y_test, "Test")
-
+    clf.plot_accuracy_graph()
+    clf.plot_confusion_matrix(y_test)
